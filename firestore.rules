@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: products
+    // Fields: name (string), description (string), price (number), stock (number), imageUrl (string), createdAt (timestamp)
+    //
+    // Collection: orders
+    // Fields: userId (string), items (array), total (number), status (string), paymentMethod (string), customerInfo (map), createdAt (timestamp)
+    //
+    // Collection: users
+    // Fields: email (string), role (string), createdAt (timestamp)
+    //
+    // Collection: project_prices
+    // Fields: name (string), basePrice (number), unitName (string), description (string), createdAt (timestamp)
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+         request.auth.token.email == "amewengenhariaeletrica@gmail.com" &&
+         request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Products: Everyone can read, only admins can write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Orders: Users can read/write their own, admins can read/write all
+    match /orders/{orderId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    // Users: Users can read/write their own, admins can read/write all
+    match /users/{userId} {
+      allow read: if isAdmin() || isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role);
+    }
+
+    // Featured Items: Everyone can read, only admins can write
+    match /featured/{itemId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Project Prices: Everyone can read, only admins can write
+    match /project_prices/{priceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

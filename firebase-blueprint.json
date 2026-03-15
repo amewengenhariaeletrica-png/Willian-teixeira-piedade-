@@ -1,0 +1,76 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A box/product available for sale",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the box" },
+        "description": { "type": "string", "description": "Short description" },
+        "price": { "type": "number", "description": "Price in BRL" },
+        "stock": { "type": "integer", "description": "Available quantity" },
+        "imageUrl": { "type": "string", "description": "URL of the product image" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "price", "stock", "imageUrl"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "paid", "shipped", "cancelled"] },
+        "paymentMethod": { "type": "string" },
+        "customerInfo": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "items", "total", "status"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User profile and role",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "customer"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role"]
+    },
+    "FeaturedItem": {
+      "title": "Featured Item",
+      "description": "An image/item to be displayed in the featured section",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the highlight" },
+        "imageUrl": { "type": "string", "description": "URL of the image" },
+        "category": { "type": "string", "enum": ["enel", "sabesp"], "description": "Category of the highlight" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["imageUrl", "category"]
+    },
+    "ProjectPrice": {
+      "title": "Project Price",
+      "description": "Pricing for electrical projects",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the project type" },
+        "basePrice": { "type": "number", "description": "Price per unit" },
+        "unitName": { "type": "string", "description": "Unit (e.g., m², point)" },
+        "description": { "type": "string", "description": "Details about the project" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "basePrice", "unitName"]
+    }
+  },
+  "firestore": {
+    "products": { "schema": "Product", "description": "List of boxes for sale" },
+    "orders": { "schema": "Order", "description": "Customer purchase history" },
+    "users": { "schema": "User", "description": "User roles and metadata" },
+    "featured": { "schema": "FeaturedItem", "description": "Highlights for the home page" },
+    "project_prices": { "schema": "ProjectPrice", "description": "Pricing table for electrical projects" }
+  }
+}
